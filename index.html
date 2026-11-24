@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Burger Point — cardápio digital de hambúrgueres artesanais. Monte seu pedido e finalize pelo WhatsApp.">
+<title>Burger Point — Cardápio</title>
+
+<!-- Fontes modernas (se não houver internet, o navegador usa a fonte do sistema) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   BURGUER POINT — 60% preto | 30% branco | 10% vermelho
+   ============================================================ */
+:root{
+  --preto:#0a0a0b;
+  --preto-fundo:#101012;
+  --preto-card:#17171a;
+  --branco:#ffffff;
+  --branco-suave:#f4f4f5;
+  --cinza:#9b9ba3;
+  --vermelho:#e51f1f;
+  --vermelho-claro:#ff3b30;
+  --raio:18px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--preto);
+  color:var(--branco);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+}
+
+img{display:block;max-width:100%}
+
+a{text-decoration:none;color:inherit}
+
+::selection{background:var(--vermelho);color:#fff}
+
+:focus-visible{outline:3px solid var(--vermelho-claro);outline-offset:3px}
+
+/* ---------------- TOP BAR ---------------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;
+  padding:12px clamp(16px,4vw,48px);
+  background:rgba(10,10,11,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.marca{display:flex;align-items:center;gap:12px;min-width:0}
+
+.logo{
+  width:44px;height:44px;object-fit:contain;
+  border-radius:10px;flex-shrink:0;
+}
+
+.logo-fallback{
+  display:none;align-items:center;justify-content:center;
+  width:44px;height:44px;flex-shrink:0;
+  background:#fff;border-radius:12px;overflow:hidden;
+}
+
+.marca-nome{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(1.35rem,3vw,1.7rem);
+  letter-spacing:2px;
+  line-height:1;
+  white-space:nowrap;
+}
+
+.marca-nome .ponto{color:var(--vermelho)}
+
+/* botão do carrinho */
+.carrinho-btn{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:46px;height:46px;
+  border-radius:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  transition:.25s;
+}
+.carrinho-btn:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+.carrinho-btn svg{width:22px;height:22px;fill:var(--branco)}
+
+.badge{
+  position:absolute;top:-7px;right:-7px;
+  min-width:22px;height:22px;padding:0 5px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--vermelho);color:#fff;
+  font-size:.72rem;font-weight:800;
+  border-radius:999px;
+  border:2px solid var(--preto);
+  transform:scale(0);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.badge.ativo{transform:scale(1)}
+.badge.pulsa{animation:pulsa .4s ease}
+@keyframes pulsa{50%{transform:scale(1.35)}}
+
+/* ---------------- HERO ---------------- */
+.hero{
+  position:relative;
+  padding:clamp(56px,9vw,110px) clamp(16px,4vw,48px) clamp(48px,7vw,88px);
+  overflow:hidden;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.hero::before{
+  content:"";
+  position:absolute;inset:0;
+  background:
+    linear-gradient(90deg,rgba(10,10,11,.97) 15%,rgba(10,10,11,.72) 60%,rgba(10,10,11,.55) 100%),
+    url('img/hero.jpg') center/cover no-repeat;
+  z-index:-2;
+}
+.hero::after{
+  content:"";
+  position:absolute;top:-120px;right:-80px;
+  width:340px;height:340px;border-radius:50%;
+  background:radial-gradient(circle,rgba(229,31,31,.55),transparent 65%);
+  z-index:-1;
+}
+
+.hero-tag{
+  display:inline-block;
+  padding:7px 14px;
+  border:1px solid var(--vermelho);
+  color:var(--vermelho-claro);
+  border-radius:999px;
+  font-size:.75rem;font-weight:800;
+  letter-spacing:2.5px;text-transform:uppercase;
+  margin-bottom:22px;
+  background:rgba(229,31,31,.12);
+}
+
+.hero h1{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(2.8rem,9vw,6rem);
+  line-height:.95;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+  max-width:14ch;
+}
+.hero h1 span{color:var(--vermelho)}
+
+.hero p{
+  margin-top:18px;
+  max-width:52ch;
+  color:var(--cinza);
+  font-size:clamp(.95rem,2vw,1.1rem);
+  line-height:1.6;
+}
+
+.btn-primario{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:32px;
+  padding:15px 30px;
+  background:var(--vermelho);color:#fff;
+  font-weight:800;font-size:.95rem;
+  letter-spacing:.5px;
+  border:none;border-radius:999px;
+  cursor:pointer;
+  box-shadow:0 12px 30px rgba(229,31,31,.35);
+  transition:.25s;
+}
+.btn-primario:hover{background:var(--vermelho-claro);transform:translateY(-3px)}
+.btn-primario:active{transform:translateY(0)}
+
+/* ---------------- CARDÁPIO ---------------- */
+.cardapio{
+  padding:clamp(44px,7vw,80px) clamp(16px,4vw,48px);
+  max-width:1200px;margin:0 auto;
+}
+
+.secao-titulo{
+  display:flex;align-items:center;gap:16px;
+  margin-bottom:8px;
+}
+.secao-titulo h2{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(2rem,5vw,3rem);
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+.secao-titulo::after{
+  content:"";flex:1;height:3px;
+  background:linear-gradient(90deg,var(--vermelho),transparent);
+  border-radius:2px;
+}
+
+.secao-sub{color:var(--cinza);margin-bottom:34px;font-size:.95rem}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(330px,1fr));
+  gap:20px;
+}
+
+/* card do produto: IMAGEM à esquerda | NOME, PREÇO e botão + à direita */
+.card{
+  display:flex;align-items:center;gap:14px;
+  background:var(--branco);
+  color:var(--preto);
+  padding:12px;
+  border-radius:var(--raio);
+  transition:transform .25s,box-shadow .25s;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+}
+.card:hover{
+  transform:translateY(-5px);
+  box-shadow:0 20px 45px rgba(0,0,0,.55);
+}
+
+.card-img{
+  width:118px;height:100px;flex-shrink:0;
+  object-fit:cover;
+  border-radius:12px;
+  background:var(--branco-suave);
+}
+
+.card-info{
+  flex:1;min-width:0;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;
+}
+
+.card-texto{min-width:0}
+
+.card-texto h3{
+  font-size:1.02rem;font-weight:800;
+  color:var(--preto);
+  line-height:1.25;
+  letter-spacing:-.2px;
+}
+
+.card-texto .descricao{
+  display:block;
+  margin-top:3px;
+  font-size:.76rem;
+  color:#6b6b73;
+  line-height:1.35;
+}
+
+.preco{
+  margin-top:8px;
+  font-size:1.18rem;
+  font-weight:800;
+  color:var(--preto);
+  white-space:nowrap;
+}
+.preco .cifra{font-size:.78rem;font-weight:700;color:#6b6b73;margin-right:3px}
+
+/* botão + */
+.btn-add{
+  flex-shrink:0;
+  width:46px;height:46px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--vermelho);color:#fff;
+  font-size:1.7rem;font-weight:600;line-height:1;
+  border:none;border-radius:50%;
+  cursor:pointer;
+  box-shadow:0 8px 20px rgba(229,31,31,.35);
+  transition:transform .18s,background .18s;
+}
+.btn-add:hover{background:var(--vermelho-claro);transform:scale(1.09)}
+.btn-add:active{transform:scale(.9)}
+.btn-add.adicionado{animation:check .45s ease}
+
+@keyframes check{
+  0%{transform:scale(1)}
+  40%{transform:scale(1.25)}
+  100%{transform:scale(1)}
+}
+
+/* ---------------- RODAPÉ ---------------- */
+footer{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:34px clamp(16px,4vw,48px);
+  text-align:center;
+  color:var(--cinza);
+  font-size:.82rem;
+  line-height:1.8;
+}
+footer strong{color:var(--branco);letter-spacing:1px}
+footer .credito{font-size:.72rem;color:#5f5f66;margin-top:8px}
+
+/* ---------------- AVISO (toast) ---------------- */
+.toast{
+  position:fixed;left:50%;bottom:28px;
+  display:flex;align-items:center;gap:10px;
+  background:var(--branco);color:var(--preto);
+  padding:14px 24px;
+  border-radius:999px;
+  font-size:.9rem;font-weight:700;
+  box-shadow:0 18px 45px rgba(0,0,0,.55);
+  border-left:5px solid var(--vermelho);
+  z-index:100;
+  opacity:0;
+  visibility:hidden;
+  transform:translate(-50%,250%);
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),opacity .3s,visibility .3s;
+  max-width:calc(100vw - 32px);
+}
+.toast.visivel{transform:translate(-50%,0);opacity:1;visibility:visible}
+
+/* ---------------- RESPONSIVO ---------------- */
+@media (max-width:420px){
+  .card-img{width:96px;height:88px}
+  .card-texto h3{font-size:.94rem}
+  .preco{font-size:1.05rem}
+  .btn-add{width:42px;height:42px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===================== BARRA SUPERIOR ===================== -->
+<header class="topbar">
+  <a class="marca" href="index.html" aria-label="Burger Point — página inicial">
+    <!-- Troque "logo.png" pela imagem da sua logo -->
+    <img src="logo.png" alt="Logo Burger Point" class="logo"
+         onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
+    <!-- Recriação da logo enviada (usada enquanto logo.png não existir na pasta) -->
+    <span class="logo-fallback" id="logoFallback" aria-hidden="true">
+      <svg width="44" height="44" viewBox="0 0 120 120" role="img" aria-label="Burger Point">
+        <rect width="120" height="120" fill="#ffffff"/>
+        <g fill="#0a0a0b">
+          <g transform="translate(60 16) scale(9.5)"><path d="M0,-1 L0.2645,-0.3641 L0.9511,-0.309 L0.428,0.1391 L0.5878,0.809 L0,0.45 L-0.5878,0.809 L-0.428,0.1391 L-0.9511,-0.309 L-0.2645,-0.3641 Z"/></g>
+          <g transform="translate(33 23) scale(6)"><path d="M0,-1 L0.2645,-0.3641 L0.9511,-0.309 L0.428,0.1391 L0.5878,0.809 L0,0.45 L-0.5878,0.809 L-0.428,0.1391 L-0.9511,-0.309 L-0.2645,-0.3641 Z"/></g>
+          <g transform="translate(87 23) scale(6)"><path d="M0,-1 L0.2645,-0.3641 L0.9511,-0.309 L0.428,0.1391 L0.5878,0.809 L0,0.45 L-0.5878,0.809 L-0.428,0.1391 L-0.9511,-0.309 L-0.2645,-0.3641 Z"/></g>
+          <path d="M14,60 A46,30 0 0 1 106,60 Z"/>
+          <rect x="12" y="66" width="96" height="12" rx="6"/>
+          <path d="M12,88 C18,82 27,85 35,87 C43,89 47,97 53,97 C58,97 61,89 68,87.5 C76,85.7 85,88 93,87 C101,86 105,85 108,88 L108,93 C108,104 86,112 60,112 C34,112 12,104 12,93 Z"/>
+        </g>
+        <g fill="#ffffff">
+          <ellipse cx="44" cy="47" rx="4.2" ry="2.8" transform="rotate(-30 44 47)"/>
+          <ellipse cx="58" cy="42" rx="4.2" ry="2.8" transform="rotate(-10 58 42)"/>
+          <ellipse cx="72" cy="46" rx="4.2" ry="2.8" transform="rotate(15 72 46)"/>
+          <ellipse cx="86" cy="53" rx="4.2" ry="2.8" transform="rotate(30 86 53)"/>
+          <ellipse cx="33" cy="55" rx="4.2" ry="2.8" transform="rotate(-35 33 55)"/>
+          <ellipse cx="50" cy="55" rx="4.2" ry="2.8" transform="rotate(10 50 55)"/>
+          <ellipse cx="64" cy="54" rx="4.2" ry="2.8" transform="rotate(-15 64 54)"/>
+          <ellipse cx="78" cy="57" rx="4.2" ry="2.8" transform="rotate(20 78 57)"/>
+          <ellipse cx="30" cy="45" rx="4.2" ry="2.8" transform="rotate(-20 30 45)"/>
+        </g>
+      </svg>
+    </span>
+    <span class="marca-nome">BURGER <span class="ponto">POINT</span></span>
+  </a>
+
+  <a class="carrinho-btn" href="carrinho.html" aria-label="Abrir carrinho de compras" title="Carrinho">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.41-.41 1.75-1.03l3.24-5.88A1 1 0 0 0 20.76 6H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.16z"/></svg>
+    <span class="badge" id="badgeCarrinho">0</span>
+  </a>
+</header>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero">
+  <span class="hero-tag">Hamburgueria artesanal</span>
+  <h1>O sabor que <span>marca ponto</span></h1>
+  <p>Pães frescos, carne moída na hora e ingredientes de verdade. Escolha seus burgers, monte o carrinho e finalize o pedido direto pelo WhatsApp.</p>
+  <a class="btn-primario" href="#cardapio">Ver cardápio &darr;</a>
+</section>
+
+<!-- ===================== CARDÁPIO ===================== -->
+<main class="cardapio" id="cardapio">
+  <div class="secao-titulo"><h2>Cardápio</h2></div>
+  <p class="secao-sub">Toque no <strong>+</strong> para adicionar um item ao carrinho.</p>
+
+  <div class="grid">
+
+    <!-- 1 -->
+    <article class="card" data-id="classico" data-nome="Cheeseburger Clássico" data-preco="24.90" data-img="img/classico.jpg">
+      <img class="card-img" src="img/classico.jpg" alt="Cheeseburger Clássico" loading="lazy">
+      <div class="card-info">
+        <div class="card-texto">
+          <h3>Cheeseburger Clássico</h3>
+          <span class="descricao">Pão, carne 150g, queijo e alface</span>
+          <p class="preco"><span class="cifra">R$</span>24,90</p>
+        </div>
+        <button class="btn-add" type="button" aria-label="Adicionar Cheeseburger Clássico ao carrinho">+</button>
+      </div>
+    </article>
+
+    <!-- 2 -->
+    <article class="card" data-id="bacon" data-nome="Bacon Cheeseburger" data-preco="32.90" data-img="img/bacon.jpg">
+      <img class="card-img" src="img/bacon.jpg" alt="Bacon Cheeseburger" loading="lazy">
+      <div class="card-info">
+        <div class="card-texto">
+          <h3>Bacon Cheeseburger</h3>
+          <span class="descricao">Carne 150g, cheddar, bacon crocante e tomate</span>
+          <p class="preco"><span class="cifra">R$</span>32,90</p>
+        </div>
+        <button class="btn-add" type="button" aria-label="Adicionar Bacon Cheeseburger ao carrinho">+</button>
+      </div>
+    </article>
+
+    <!-- 3 -->
+    <article class="card" data-id="smash" data-nome="Smash Point" data-preco="26.90" data-img="img/smash.jpg">
+      <img class="card-img" src="img/smash.jpg" alt="Smash Point" loading="lazy">
+      <div class="card-info">
+        <div class="card-texto">
+          <h3>Smash Point</h3>
+          <span class="descricao">Carne prensada 100g, queijo derretido e maionese da casa</span>
+          <p class="preco"><span class="cifra">R$</span>26,90</p>
+        </div>
+        <button class="btn-add" type="button" aria-label="Adicionar Smash Point ao carrinho">+</button>
+      </div>
+    </article>
+
+    <!-- 4 -->
+    <article class="card" data-id="artesanal" data-nome="Artesanal Bacon" data-preco="36.90" data-img="img/artesanal.jpg">
+      <img class="card-img" src="img/artesanal.jpg" alt="Artesanal Bacon" loading="lazy">
+      <div class="card-info">
+        <div class="card-texto">
+          <h3>Artesanal Bacon</h3>
+          <span class="descricao">Carne 200g, bacon em fatias, cebola e molho barbecue</span>
+          <p class="preco"><span class="cifra">R$</span>36,90</p>
+        </div>
+        <button class="btn-add" type="button" aria-label="Adicionar Artesanal Bacon ao carrinho">+</button>
+      </div>
+    </article>
+
+    <!-- 5 -->
+    <article class="card" data-id="salada" data-nome="Salada Fresh" data-preco="28.90" data-img="img/salada.jpg">
+      <img class="card-img" src="img/salada.jpg" alt="Salada Fresh" loading="lazy">
+      <div class="card-info">
+        <div class="card-texto">
+          <h3>Salada Fresh</h3>
+          <span class="descricao">Carne 150g, queijo, alface, tomate e cebola roxa</span>
+          <p class="preco"><span class="cifra">R$</span>28,90</p>
+        </div>
+        <button class="btn-add" type="button" aria-label="Adicionar Salada Fresh ao carrinho">+</button>
+      </div>
+    </article>
+
+    <!-- 6 -->
+    <article class="card" data-id="cheddar" data-nome="Cheddar Duplo" data-preco="34.90" data-img="img/cheddar.jpg">
+      <img class="card-img" src="img/cheddar.jpg" alt="Cheddar Duplo" loading="lazy">
+      <div class="card-info">
+        <div class="card-texto">
+          <h3>Cheddar Duplo</h3>
+          <span class="descricao">Duas carnes 150g, cheddar duplo e picles</span>
+          <p class="preco"><span class="cifra">R$</span>34,90</p>
+        </div>
+        <button class="btn-add" type="button" aria-label="Adicionar Cheddar Duplo ao carrinho">+</button>
+      </div>
+    </article>
+
+  </div>
+</main>
+
+<!-- ===================== RODAPÉ ===================== -->
+<footer>
+  <strong>BURGER POINT</strong><br>
+  Aberto de terça a domingo, das 18h às 23h30 &nbsp;•&nbsp; Entregas em toda a região
+  <div class="credito">Imagens: Wikimedia Commons</div>
+</footer>
+
+<!-- ===================== AVISO ===================== -->
+<div class="toast" id="toast" role="status" aria-live="polite">Adicionado ao carrinho!</div>
+
+<script>
+(function(){
+  'use strict';
+
+  var CHAVE = 'burguerpoint_carrinho';
+
+  /* ---- armazenamento (com proteção caso o navegador bloqueie) ---- */
+  function lerCarrinho(){
+    try{
+      var bruto = localStorage.getItem(CHAVE);
+      return bruto ? JSON.parse(bruto) : {};
+    }catch(e){ return {}; }
+  }
+  function salvarCarrinho(c){
+    try{ localStorage.setItem(CHAVE, JSON.stringify(c)); }catch(e){}
+  }
+
+  function totalItens(carrinho){
+    var total = 0;
+    for(var id in carrinho){ total += carrinho[id].q; }
+    return total;
+  }
+
+  /* ---- badge do carrinho ---- */
+  var badge = document.getElementById('badgeCarrinho');
+  function atualizarBadge(){
+    var n = totalItens(lerCarrinho());
+    badge.textContent = n;
+    badge.classList.toggle('ativo', n > 0);
+  }
+
+  /* ---- aviso ---- */
+  var toast = document.getElementById('toast');
+  var relogio = null;
+  function mostrarToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('visivel');
+    clearTimeout(relogio);
+    relogio = setTimeout(function(){ toast.classList.remove('visivel'); }, 2200);
+  }
+
+  /* ---- adicionar produto ---- */
+  document.addEventListener('click', function(ev){
+    var botao = ev.target.closest('.btn-add');
+    if(!botao) return;
+
+    var card = botao.closest('.card');
+    if(!card) return;
+
+    var id = card.dataset.id;
+    var carrinho = lerCarrinho();
+
+    if(carrinho[id]){
+      carrinho[id].q += 1;
+    }else{
+      carrinho[id] = {
+        q: 1,
+        nome: card.dataset.nome,
+        preco: parseFloat(card.dataset.preco),
+        img: card.dataset.img
+      };
+    }
+
+    salvarCarrinho(carrinho);
+    atualizarBadge();
+
+    botao.classList.remove('adicionado');
+    void botao.offsetWidth;           /* reinicia a animação */
+    botao.classList.add('adicionado');
+
+    mostrarToast(card.dataset.nome + ' adicionado ao carrinho!');
+  });
+
+  atualizarBadge();
+})();
+</script>
+
+</body>
+</html>

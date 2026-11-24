@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Burger Point — seu carrinho. Confira os itens e finalize o pagamento pelo WhatsApp.">
+<title>Burger Point — Carrinho</title>
+
+<!-- Fontes modernas (se não houver internet, o navegador usa a fonte do sistema) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   BURGUER POINT — 60% preto | 30% branco | 10% vermelho
+   ============================================================ */
+:root{
+  --preto:#0a0a0b;
+  --preto-card:#17171a;
+  --branco:#ffffff;
+  --branco-suave:#f4f4f5;
+  --cinza:#9b9ba3;
+  --vermelho:#e51f1f;
+  --vermelho-claro:#ff3b30;
+  --raio:18px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+
+html{scroll-behavior:smooth}
+
+body{
+  background:var(--preto);
+  color:var(--branco);
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+::selection{background:var(--vermelho);color:#fff}
+:focus-visible{outline:3px solid var(--vermelho-claro);outline-offset:3px}
+
+/* ---------------- TOP BAR ---------------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:16px;
+  padding:12px clamp(16px,4vw,48px);
+  background:rgba(10,10,11,.92);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.marca{display:flex;align-items:center;gap:12px;min-width:0}
+
+.logo{width:44px;height:44px;object-fit:contain;border-radius:10px;flex-shrink:0}
+
+.logo-fallback{
+  display:none;align-items:center;justify-content:center;
+  width:44px;height:44px;flex-shrink:0;
+  background:#fff;border-radius:12px;overflow:hidden;
+}
+
+.marca-nome{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(1.35rem,3vw,1.7rem);
+  letter-spacing:2px;line-height:1;white-space:nowrap;
+}
+.marca-nome .ponto{color:var(--vermelho)}
+
+.carrinho-btn{
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+  width:46px;height:46px;border-radius:14px;
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.14);
+  transition:.25s;
+}
+.carrinho-btn:hover{background:rgba(255,255,255,.12);transform:translateY(-2px)}
+.carrinho-btn svg{width:22px;height:22px;fill:var(--branco)}
+
+.badge{
+  position:absolute;top:-7px;right:-7px;
+  min-width:22px;height:22px;padding:0 5px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--vermelho);color:#fff;
+  font-size:.72rem;font-weight:800;border-radius:999px;
+  border:2px solid var(--preto);
+  transform:scale(0);
+  transition:transform .25s cubic-bezier(.34,1.56,.64,1);
+}
+.badge.ativo{transform:scale(1)}
+
+/* ---------------- CONTEÚDO ---------------- */
+main{
+  flex:1;
+  width:100%;max-width:900px;
+  margin:0 auto;
+  padding:clamp(32px,6vw,56px) clamp(16px,4vw,48px) 60px;
+}
+
+.voltar{
+  display:inline-flex;align-items:center;gap:8px;
+  color:var(--cinza);font-size:.85rem;font-weight:600;
+  margin-bottom:26px;transition:.2s;
+}
+.voltar:hover{color:var(--branco);transform:translateX(-4px)}
+
+.secao-titulo{display:flex;align-items:center;gap:16px;margin-bottom:8px}
+.secao-titulo h1{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(2.2rem,6vw,3.4rem);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.secao-titulo::after{
+  content:"";flex:1;height:3px;border-radius:2px;
+  background:linear-gradient(90deg,var(--vermelho),transparent);
+}
+.secao-sub{color:var(--cinza);margin-bottom:30px;font-size:.92rem}
+
+/* ---------------- LISTA DE PRODUTOS ---------------- */
+.lista{display:flex;flex-direction:column;gap:14px}
+
+.item{
+  display:flex;align-items:center;gap:16px;
+  background:var(--branco);color:var(--preto);
+  padding:14px;border-radius:var(--raio);
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+  animation:entra .35s ease both;
+}
+@keyframes entra{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.item-img{
+  width:86px;height:86px;flex-shrink:0;
+  object-fit:cover;border-radius:12px;background:var(--branco-suave);
+}
+
+.item-info{flex:1;min-width:0}
+.item-info h2{font-size:1rem;font-weight:800;line-height:1.3}
+.item-preco{margin-top:5px;font-size:.88rem;color:#6b6b73;font-weight:600}
+
+/* controles de quantidade */
+.qtd{display:flex;align-items:center;gap:10px;margin-top:10px}
+.qtd button{
+  width:30px;height:30px;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--preto);color:#fff;
+  font-size:1.05rem;font-weight:700;line-height:1;
+  border:none;border-radius:9px;cursor:pointer;
+  transition:.18s;
+}
+.qtd button:hover{background:var(--vermelho);transform:scale(1.08)}
+.qtd .numero{
+  min-width:26px;text-align:center;
+  font-weight:800;font-size:.95rem;
+}
+
+.item-dir{
+  display:flex;flex-direction:column;align-items:flex-end;
+  gap:10px;flex-shrink:0;
+}
+.subtotal{font-weight:800;font-size:1.02rem;white-space:nowrap}
+
+.remover{
+  background:none;border:none;cursor:pointer;
+  color:#8a8a92;font-size:.76rem;font-weight:700;
+  padding:4px 6px;border-radius:6px;transition:.18s;
+}
+.remover:hover{color:var(--vermelho);background:rgba(229,31,31,.1)}
+
+/* ---------------- ESTADO VAZIO ---------------- */
+.vazio{
+  background:var(--branco);color:var(--preto);
+  border-radius:var(--raio);
+  padding:46px 24px;text-align:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+}
+.vazio .icone{font-size:2.6rem}
+.vazio h2{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:1.7rem;letter-spacing:1.5px;margin-top:10px;
+}
+.vazio p{color:#6b6b73;font-size:.9rem;margin-top:6px}
+
+.btn-primario{
+  display:inline-flex;align-items:center;gap:10px;
+  margin-top:22px;padding:14px 28px;
+  background:var(--vermelho);color:#fff;
+  font-weight:800;font-size:.92rem;letter-spacing:.5px;
+  border:none;border-radius:999px;cursor:pointer;
+  box-shadow:0 12px 30px rgba(229,31,31,.35);
+  transition:.25s;
+}
+.btn-primario:hover{background:var(--vermelho-claro);transform:translateY(-3px)}
+
+/* ---------------- PREÇO FINAL ---------------- */
+.resumo{
+  margin-top:26px;
+  background:var(--branco);color:var(--preto);
+  border-radius:var(--raio);
+  padding:22px 24px;
+  box-shadow:0 10px 30px rgba(0,0,0,.4);
+  border-top:5px solid var(--vermelho);
+}
+.resumo-linha{
+  display:flex;align-items:baseline;justify-content:space-between;gap:14px;
+}
+.resumo-linha .rotulo{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:1.5rem;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--vermelho);
+}
+.resumo-linha .valor{
+  font-family:'Bebas Neue','Arial Narrow',Impact,sans-serif;
+  font-size:clamp(2rem,7vw,2.8rem);
+  letter-spacing:1px;line-height:1;
+}
+.resumo .itens{color:#6b6b73;font-size:.82rem;margin-top:8px}
+
+/* ---------------- BOTÃO WHATSAPP ---------------- */
+.btn-whatsapp{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;margin-top:16px;
+  padding:18px 22px;
+  background:var(--vermelho);color:#fff;
+  font-size:clamp(.95rem,3vw,1.08rem);font-weight:800;
+  letter-spacing:.3px;text-align:center;
+  border:none;border-radius:14px;cursor:pointer;
+  box-shadow:0 14px 34px rgba(229,31,31,.4);
+  transition:.25s;
+}
+.btn-whatsapp svg{width:26px;height:26px;fill:#fff;flex-shrink:0}
+.btn-whatsapp:hover{background:var(--vermelho-claro);transform:translateY(-3px)}
+.btn-whatsapp:active{transform:translateY(0)}
+
+.aviso{
+  text-align:center;color:#5f5f66;
+  font-size:.76rem;margin-top:14px;line-height:1.6;
+}
+
+/* ---------------- RODAPÉ ---------------- */
+footer{
+  border-top:1px solid rgba(255,255,255,.08);
+  padding:30px clamp(16px,4vw,48px);
+  text-align:center;color:var(--cinza);
+  font-size:.8rem;line-height:1.8;
+}
+footer strong{color:var(--branco);letter-spacing:1px}
+
+/* ---------------- RESPONSIVO ---------------- */
+@media (max-width:520px){
+  .item{gap:12px;flex-wrap:wrap}
+  .item-img{width:72px;height:72px}
+  .item-dir{
+    flex-direction:row;align-items:center;
+    width:100%;justify-content:space-between;
+    border-top:1px solid #ececf0;padding-top:10px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===================== BARRA SUPERIOR ===================== -->
+<header class="topbar">
+  <a class="marca" href="index.html" aria-label="Burger Point — página inicial">
+    <img src="logo.png" alt="Logo Burger Point" class="logo"
+         onerror="this.style.display='none';document.getElementById('logoFallback').style.display='flex'">
+    <!-- Recriação da logo enviada (usada enquanto logo.png não existir na pasta) -->
+    <span class="logo-fallback" id="logoFallback" aria-hidden="true">
+      <svg width="44" height="44" viewBox="0 0 120 120" role="img" aria-label="Burger Point">
+        <rect width="120" height="120" fill="#ffffff"/>
+        <g fill="#0a0a0b">
+          <g transform="translate(60 16) scale(9.5)"><path d="M0,-1 L0.2645,-0.3641 L0.9511,-0.309 L0.428,0.1391 L0.5878,0.809 L0,0.45 L-0.5878,0.809 L-0.428,0.1391 L-0.9511,-0.309 L-0.2645,-0.3641 Z"/></g>
+          <g transform="translate(33 23) scale(6)"><path d="M0,-1 L0.2645,-0.3641 L0.9511,-0.309 L0.428,0.1391 L0.5878,0.809 L0,0.45 L-0.5878,0.809 L-0.428,0.1391 L-0.9511,-0.309 L-0.2645,-0.3641 Z"/></g>
+          <g transform="translate(87 23) scale(6)"><path d="M0,-1 L0.2645,-0.3641 L0.9511,-0.309 L0.428,0.1391 L0.5878,0.809 L0,0.45 L-0.5878,0.809 L-0.428,0.1391 L-0.9511,-0.309 L-0.2645,-0.3641 Z"/></g>
+          <path d="M14,60 A46,30 0 0 1 106,60 Z"/>
+          <rect x="12" y="66" width="96" height="12" rx="6"/>
+          <path d="M12,88 C18,82 27,85 35,87 C43,89 47,97 53,97 C58,97 61,89 68,87.5 C76,85.7 85,88 93,87 C101,86 105,85 108,88 L108,93 C108,104 86,112 60,112 C34,112 12,104 12,93 Z"/>
+        </g>
+        <g fill="#ffffff">
+          <ellipse cx="44" cy="47" rx="4.2" ry="2.8" transform="rotate(-30 44 47)"/>
+          <ellipse cx="58" cy="42" rx="4.2" ry="2.8" transform="rotate(-10 58 42)"/>
+          <ellipse cx="72" cy="46" rx="4.2" ry="2.8" transform="rotate(15 72 46)"/>
+          <ellipse cx="86" cy="53" rx="4.2" ry="2.8" transform="rotate(30 86 53)"/>
+          <ellipse cx="33" cy="55" rx="4.2" ry="2.8" transform="rotate(-35 33 55)"/>
+          <ellipse cx="50" cy="55" rx="4.2" ry="2.8" transform="rotate(10 50 55)"/>
+          <ellipse cx="64" cy="54" rx="4.2" ry="2.8" transform="rotate(-15 64 54)"/>
+          <ellipse cx="78" cy="57" rx="4.2" ry="2.8" transform="rotate(20 78 57)"/>
+          <ellipse cx="30" cy="45" rx="4.2" ry="2.8" transform="rotate(-20 30 45)"/>
+        </g>
+      </svg>
+    </span>
+    <span class="marca-nome">BURGER <span class="ponto">POINT</span></span>
+  </a>
+
+  <a class="carrinho-btn" href="carrinho.html" aria-label="Abrir carrinho de compras" title="Carrinho">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.41-.41 1.75-1.03l3.24-5.88A1 1 0 0 0 20.76 6H6.21l-.94-2H1v2h2l3.6 7.59-1.35 2.44C4.52 16.37 5.48 18 7 18h12v-2H7.16z"/></svg>
+    <span class="badge" id="badgeCarrinho">0</span>
+  </a>
+</header>
+
+<!-- ===================== CONTEÚDO ===================== -->
+<main>
+  <a class="voltar" href="index.html">&larr; Voltar ao cardápio</a>
+
+  <div class="secao-titulo"><h1>Seu carrinho</h1></div>
+  <p class="secao-sub">Confira os itens e finalize o pedido pelo WhatsApp.</p>
+
+  <div id="areaCarrinho"></div>
+
+  <!-- Preço final + botão do WhatsApp (só aparece com itens no carrinho) -->
+  <section class="resumo" id="resumo" hidden>
+    <div class="resumo-linha">
+      <span class="rotulo">Preço final</span>
+      <span class="valor" id="precoFinal">R$ 0,00</span>
+    </div>
+    <p class="itens" id="resumoItens"></p>
+
+    <button class="btn-whatsapp" id="btnWhatsapp" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/></svg>
+      finalize o pagamento no whatsapp
+    </button>
+
+    <p class="aviso">Ao clicar, você será direcionado para o WhatsApp com o resumo do pedido já escrito.</p>
+  </section>
+</main>
+
+<!-- ===================== RODAPÉ ===================== -->
+<footer>
+  <strong>BURGER POINT</strong><br>
+  Aberto de terça a domingo, das 18h às 23h30 &nbsp;•&nbsp; Entregas em toda a região
+</footer>
+
+<script>
+(function(){
+  'use strict';
+
+  var CHAVE = 'burguerpoint_carrinho';
+
+  /* >>> TROQUE O NÚMERO AQUI (formato: 55 + DDD + número) <<< */
+  var WHATSAPP_NUMERO = '5511999999999';
+
+  var area = document.getElementById('areaCarrinho');
+  var resumo = document.getElementById('resumo');
+  var badge = document.getElementById('badgeCarrinho');
+
+  function lerCarrinho(){
+    try{
+      var bruto = localStorage.getItem(CHAVE);
+      return bruto ? JSON.parse(bruto) : {};
+    }catch(e){ return {}; }
+  }
+  function salvarCarrinho(c){
+    try{ localStorage.setItem(CHAVE, JSON.stringify(c)); }catch(e){}
+  }
+
+  function moeda(v){
+    return 'R$ ' + v.toFixed(2).replace('.', ',');
+  }
+
+  function totalItens(carrinho){
+    var n = 0;
+    for(var id in carrinho){ n += carrinho[id].q; }
+    return n;
+  }
+
+  function atualizarBadge(){
+    var n = totalItens(lerCarrinho());
+    badge.textContent = n;
+    badge.classList.toggle('ativo', n > 0);
+  }
+
+  /* ---------- render ---------- */
+  function renderizar(){
+    var carrinho = lerCarrinho();
+    var ids = Object.keys(carrinho);
+
+    atualizarBadge();
+
+    /* carrinho vazio */
+    if(ids.length === 0){
+      area.innerHTML =
+        '<div class="vazio">' +
+          '<div class="icone">&#127828;</div>' +
+          '<h2>Seu carrinho está vazio</h2>' +
+          '<p>Escolha seus burgers favoritos no cardápio.</p>' +
+          '<a class="btn-primario" href="index.html">Ver cardápio</a>' +
+        '</div>';
+      resumo.hidden = true;
+      return;
+    }
+
+    /* lista de produtos */
+    var html = '<div class="lista">';
+    var total = 0;
+    var qtdTotal = 0;
+
+    ids.forEach(function(id, i){
+      var p = carrinho[id];
+      var subtotal = p.preco * p.q;
+      total += subtotal;
+      qtdTotal += p.q;
+
+      html +=
+        '<article class="item" data-id="' + id + '" style="animation-delay:' + (i * 60) + 'ms">' +
+          '<img class="item-img" src="' + p.img + '" alt="' + p.nome + '">' +
+          '<div class="item-info">' +
+            '<h2>' + p.nome + '</h2>' +
+            '<p class="item-preco">Preço unitário: ' + moeda(p.preco) + '</p>' +
+            '<div class="qtd">' +
+              '<button type="button" data-acao="menos" aria-label="Diminuir quantidade de ' + p.nome + '">&minus;</button>' +
+              '<span class="numero">' + p.q + '</span>' +
+              '<button type="button" data-acao="mais" aria-label="Aumentar quantidade de ' + p.nome + '">+</button>' +
+            '</div>' +
+          '</div>' +
+          '<div class="item-dir">' +
+            '<span class="subtotal">' + moeda(subtotal) + '</span>' +
+            '<button type="button" class="remover" data-acao="remover">Remover</button>' +
+          '</div>' +
+        '</article>';
+    });
+
+    html += '</div>';
+    area.innerHTML = html;
+
+    /* preço final */
+    resumo.hidden = false;
+    document.getElementById('precoFinal').textContent = moeda(total);
+    document.getElementById('resumoItens').textContent =
+      qtdTotal + (qtdTotal === 1 ? ' item no carrinho' : ' itens no carrinho');
+  }
+
+  /* ---------- alterar quantidade / remover ---------- */
+  area.addEventListener('click', function(ev){
+    var alvo = ev.target.closest('[data-acao]');
+    if(!alvo) return;
+
+    var item = alvo.closest('.item');
+    if(!item) return;
+
+    var id = item.dataset.id;
+    var acao = alvo.dataset.acao;
+    var carrinho = lerCarrinho();
+    if(!carrinho[id]) return;
+
+    if(acao === 'mais'){ carrinho[id].q += 1; }
+    if(acao === 'menos'){
+      carrinho[id].q -= 1;
+      if(carrinho[id].q <= 0){ delete carrinho[id]; }
+    }
+    if(acao === 'remover'){ delete carrinho[id]; }
+
+    salvarCarrinho(carrinho);
+    renderizar();
+  });
+
+  /* ---------- botão do WhatsApp ---------- */
+  document.getElementById('btnWhatsapp').addEventListener('click', function(){
+    var carrinho = lerCarrinho();
+    var ids = Object.keys(carrinho);
+    if(ids.length === 0) return;
+
+    var linhas = [];
+    var total = 0;
+
+    ids.forEach(function(id){
+      var p = carrinho[id];
+      var sub = p.preco * p.q;
+      total += sub;
+      linhas.push(p.q + 'x ' + p.nome + ' — ' + moeda(sub));
+    });
+
+    var msg =
+      'Olá, Burger Point! Quero finalizar este pedido:\n\n' +
+      linhas.join('\n') +
+      '\n\n*Preço final: ' + moeda(total) + '*';
+
+    var url = 'https://wa.me/' + WHATSAPP_NUMERO + '?text=' + encodeURIComponent(msg);
+    window.open(url, '_blank', 'noopener');
+  });
+
+  renderizar();
+})();
+</script>
+
+</body>
+</html>
